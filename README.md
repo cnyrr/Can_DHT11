@@ -1,5 +1,5 @@
 # Can_DHT11
-A simple DHT11 library with every step documented according to the datasheet. Written for Arduino Nano, should be compatible with most boards.
+A simple non-blocking DHT11 library with every step documented according to the datasheet. Written for Arduino Nano, should be compatible with most boards.
 ## Usage
 
 ```
@@ -26,6 +26,6 @@ void loop() {
 ```
 ## Troubleshooting
 ### Values are always 0
-Something is causing checksum to not match, connection is bad or you simply forget to poll the sensor, either way data is set to all zeros.
+Something is causing checksums to not match, connection is bad or you simply forget to poll the sensor, either way data is set to all zeros.
 ## License
 Public Domain, feel free to do anything you want with the code.
