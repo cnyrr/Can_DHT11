@@ -26,6 +26,6 @@ void loop() {
 ```
 ## Troubleshooting
 ### Values are always 0
-Something is causing checksum to be invalid or you forget to poll the sensor, either way data resets to all zeros.
+Something is causing checksum to be invalid or you forget to poll the sensor, either way data is set to all zeros.
 ## License
 Public Domain, feel free to do anything you want with the code.
