@@ -15,7 +15,6 @@ class Can_DHT11 {
   private:
     uint32_t last_poll;
     uint8_t _PIN;
-    uint8_t connection_fail;
     uint8_t data[5];
 
     void waitSignal(uint8_t state);

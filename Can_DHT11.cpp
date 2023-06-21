@@ -12,18 +12,11 @@ Can_DHT11::Can_DHT11(uint8_t DATAPIN): _PIN(DATAPIN) {
 Can_DHT11::~Can_DHT11() {}
 
 void Can_DHT11::read() {
-  // Handle millis() overflow.
-  if (last_poll > millis()) { last_poll = 0; }
-
-  // DHT needs 1 second between polls.
-  if ((millis() > 1000) && (millis() - 1000 > last_poll)) {
-    transferData();
-    last_poll = millis();
-  }
-  else {
-    delay(1001);
-    read();
-  }
+  // DHT needs 1 second after initiliazation and between polls.
+  // Duration isn't affected by unsigned overflow.
+  while(millis() - last_poll < 1000) {;}
+  last_poll = millis();
+  transferData();
 }
 
 float Can_DHT11::getRelativeHumidity() {
@@ -40,13 +33,11 @@ void Can_DHT11::transferData() {
   // Prepare our data.
   uint8_t block = 0;
   uint8_t current_bit = 0;
-  uint8_t checksum = 0;
-  connection_fail = 0;
   data[0] = data[1] = data[2] = data[3] = data[4] = 0;
 
   // Set bus voltage LOW for at least 18ms to ensure DHT receives start signal.
   digitalWrite(_PIN, LOW);
-  delay(20);
+  while(millis() - last_poll < 20) {;}
 
   // Start of time critical code.
   noInterrupts();
@@ -73,7 +64,7 @@ void Can_DHT11::transferData() {
       delayMicroseconds(30);
 
       // Set the received bit.
-      if (digitalRead(_PIN)) {data[block] = data[block] + 1;}
+      data[block] = data[block] + digitalRead(_PIN);
 
       // Left shift unless we got the last bit.
       if (current_bit != 7) {data[block] = data[block] << 1;}
@@ -93,11 +84,9 @@ void Can_DHT11::transferData() {
   pinMode(_PIN, OUTPUT);
   digitalWrite(_PIN, HIGH);
 
-  // Calculate checksum.
-  checksum = data[0] + data[1] + data[2] + data[3];
 
-  // Dump data if checksum is wrong or connection fails.
-  if(checksum != data[4] || connection_fail) {
+  // Dump data if checksum is wrong.
+  if(data[4] != (data[0] + data[1] + data[2] + data[3])) {
     data[0] = data[1] = data[2] = data[3] = data[4] = 0;
   }
 }
@@ -105,12 +94,11 @@ void Can_DHT11::transferData() {
 void Can_DHT11::waitSignal(uint8_t state) {
   uint8_t counter = 100;
 
-  // Stop waiting and raise connection fail flag if counter reachs 0.
+  // Why waste space with a flag when we can corrupt the data on purpose and fail checksum check.
   while(digitalRead(_PIN) ==  state) {
-    if (counter == 0) {
-      connection_fail = 1;
+    if (counter-- == 0) {
+      data[0] = 85;
       break;
     }
-    counter = counter - 1;
   }
 }
