@@ -2,7 +2,7 @@
 A simple non-blocking DHT11 library with every step documented according to the datasheet. Written for Arduino Nano, should be compatible with most boards.
 ## Usage
 
-```
+``` c++
 #include "Can_DHT11.h"
 
 Can_DHT11 dht11(8);
